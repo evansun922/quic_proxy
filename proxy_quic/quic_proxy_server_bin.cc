@@ -53,6 +53,10 @@ int main(int argc, char* argv[]) {
     if (-1 == pid) {
       exit(0);
     } else if (0 == pid) {
+      cpu_set_t mask;
+      CPU_ZERO(&mask);
+      CPU_SET(i,&mask);
+      ::sched_setaffinity(0, sizeof(mask), &mask);
       worker();
       exit(0);
     }
