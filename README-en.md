@@ -4,7 +4,7 @@ quic_proxy is a high-performance quic proxy service. it receive a  request with 
 
 The chromium provide a demo service of quic, but this demo is a single process, and it download the full file from source station before it can be sent to the frontend, this is not acceptable for big file.
 
-We have rewritten epoll_quic_server based on the chromium， the new quic server support for high concurrency. its features:
+We have rewritten epoll_quic_server based on the chromium, the new quic server support for high concurrency. its features:
 
 - Use SO_REUSEADDR to improve the ability of services to use multiple cores.
 - Use recvmmsg,sendmmsg to reduce user mode and kernel mode switching and improve service performance.
@@ -54,7 +54,7 @@ We have rewritten epoll_quic_server based on the chromium， the new quic server
    ```
 
 5. cd src; gn gen out/Debug
-6. ninja -C out/Debug quic_proxy_server (step 5，6 see [Build the QUIC client and server](https://www.chromium.org/quic/playing-with-quic))
+6. ninja -C out/Debug quic_proxy_server (step 5, 6 see [Build the QUIC client and server](https://www.chromium.org/quic/playing-with-quic))
 
 ## Running
 out/Debug/quic_proxy_server --quic_proxy_backend_url=http://backend-host --certificate_file=/path/you.crt --key_file=/path/you.pkcs8
