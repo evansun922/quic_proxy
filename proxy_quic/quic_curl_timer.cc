@@ -58,7 +58,7 @@ void QuicCurlTimer::OnEvent(int fd, QuicEpollEvent* event) {
   }
 
   rc = curl_multi_socket_action(backend_->get_curlm(),
-                                CURL_SOCKET_TIMEOUT, 0, &backend_->still_running_);
+         CURL_SOCKET_TIMEOUT, 0, &backend_->still_running_);
   backend_->CheckCurlMultiInfo();
 }
 

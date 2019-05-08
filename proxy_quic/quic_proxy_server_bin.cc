@@ -46,7 +46,10 @@ int main(int argc, char* argv[]) {
   settings.logging_dest = logging::LOG_TO_SYSTEM_DEBUG_LOG;
   CHECK(logging::InitLogging(settings));
 
-  // worker();  
+  // test
+  worker();
+  return 0;
+  
   int cpu_count = ::get_nprocs();
   for(int i = 0; i < cpu_count; i++) {
     pid_t pid = ::fork();

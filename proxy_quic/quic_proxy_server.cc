@@ -18,7 +18,6 @@
 #include "net/third_party/quiche/src/quic/core/crypto/quic_random.h"
 #include "net/third_party/quiche/src/quic/core/quic_crypto_stream.h"
 #include "net/third_party/quiche/src/quic/core/quic_data_reader.h"
-#include "net/third_party/quiche/src/quic/core/quic_dispatcher.h"
 #include "net/third_party/quiche/src/quic/core/quic_epoll_alarm_factory.h"
 #include "net/third_party/quiche/src/quic/core/quic_epoll_connection_helper.h"
 #include "net/third_party/quiche/src/quic/core/quic_packets.h"
@@ -29,7 +28,7 @@
 #include "net/quic/platform/impl/quic_epoll_clock.h"
 #include "net/quic/platform/impl/quic_socket_utils.h"
 #include "net/third_party/quiche/src/quic/tools/quic_simple_crypto_server_stream_helper.h"
-#include "net/third_party/quiche/src/quic/tools/quic_simple_dispatcher.h"
+#include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_dispatcher.h"
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_backend.h"
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_packet_writer.h"
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_packet_reader.h"
@@ -169,7 +168,7 @@ QuicPacketWriter* QuicProxyServer::CreateWriter(int fd) {
 
 QuicDispatcher* QuicProxyServer::CreateQuicDispatcher() {
   QuicEpollAlarmFactory alarm_factory(&epoll_server_);
-  return new QuicSimpleDispatcher(
+  return new QuicProxyDispatcher(
       &config_, &crypto_config_, &version_manager_,
       std::unique_ptr<QuicEpollConnectionHelper>(new QuicEpollConnectionHelper(
           &epoll_server_, QuicAllocator::BUFFER_POOL)),

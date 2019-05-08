@@ -16,7 +16,7 @@ namespace quic {
   
 #if !MMSG_MORE
 // Read in larger batches to minimize recvmmsg overhead.
-const int kNumPacketsPerReadMmsgCall = 32;
+const int kNumPacketsPerReadMmsgCall = 16;
 #endif
 
 class QuicProxyPacketReader : public QuicPacketReader {

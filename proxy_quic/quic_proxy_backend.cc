@@ -3,7 +3,7 @@
 
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_backend.h"
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_server.h"
-#include "net/third_party/quiche/src/quic/tools/quic_simple_server_stream.h"
+#include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_stream.h"
 
 using spdy::SpdyHeaderBlock;
 
@@ -13,7 +13,6 @@ QuicProxyBackend::QuicProxyBackend()
   : still_running_(0),
     cache_initialized_(false),
     multi_curl_(curl_multi_init()),
-    timer_fd_(timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC)),
     server_(nullptr),
     curl_timer_(this){}
 
@@ -21,10 +20,6 @@ QuicProxyBackend::~QuicProxyBackend() {
   if (multi_curl_) {
     curl_multi_cleanup(multi_curl_);
     multi_curl_ = nullptr;
-  }
-  if (timer_fd_ != -1) {
-    ::close(timer_fd_);
-    timer_fd_ = -1;
   }
 }
 
@@ -68,26 +63,28 @@ void QuicProxyBackend::FetchResponseFromBackend(
   auto path = request_headers.find(":path");
   std::string url = backend_url_.spec() +
     std::string(path->second.substr(1, path->second.length()));
-  QuicSpdyStream* quic_spdy_stream = static_cast<QuicSpdyStream*>(
+  QuicProxyStream* quic_proxy_stream = reinterpret_cast<QuicProxyStream*>(
                          static_cast<QuicSimpleServerStream*>(quic_stream));
   if (false == CreateProxyCurl(url,
-                               quic_spdy_stream,
+                               quic_proxy_stream,
                                proxy)) {
     LOG(WARNING) << "create proxy curl failed.";
   }
-  proxy->StartHttp(request_headers);
+  
+  quic_proxy_stream->set_proxy_curl(proxy.get());
+  proxy->StartHttp(request_headers, request_body);
 }
 
 // The memory cache does not have a per-stream handler
 void QuicProxyBackend::CloseBackendResponseStream(
     QuicSimpleServerBackend::RequestHandler* quic_stream) {
- QuicSpdyStream* quic_spdy_stream = static_cast<QuicSpdyStream*>(
+  QuicProxyStream* quic_proxy_stream = reinterpret_cast<QuicProxyStream*>(
           static_cast<QuicSimpleServerStream*>(quic_stream));
-  LOG(INFO) << "CloseBackendResponseStream " << quic_spdy_stream->id();
-  auto proxy_ptr = proxy_stream_hash_.find(quic_spdy_stream);
-   if (proxy_ptr != proxy_stream_hash_.end()) {
-     proxy_ptr->second->set_stream(nullptr);
-     proxy_stream_hash_.erase(proxy_ptr);
+  LOG(INFO) << "CloseBackendResponseStream " << quic_proxy_stream->id();
+  QuicProxyCurl* proxy_curl = quic_proxy_stream->get_proxy_curl();
+  if (proxy_curl) {
+    proxy_curl->set_stream(nullptr);
+    quic_proxy_stream->set_proxy_curl(nullptr);
   }
 }
 
@@ -120,7 +117,8 @@ void QuicProxyBackend::CheckCurlMultiInfo() {
       curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &eff_url);
       // DVLOG(1) <<
       LOG(INFO) <<
-        "DONE: " << eff_url << " => (" << res << ") ";
+        "DONE: " << eff_url << " => (" << res << ") stream id: "
+                 << proxy->get_stream_id();
 
       curl_multi_remove_handle(multi_curl_, easy);
       auto proxy_ptr = proxy_http_hash_.find(easy);
@@ -130,7 +128,8 @@ void QuicProxyBackend::CheckCurlMultiInfo() {
       }
 
       if (proxy->get_stream()) {
-        proxy_stream_hash_.erase(proxy->get_stream());
+        proxy->get_stream()->set_proxy_curl(nullptr);
+        // TODO close this stream
         proxy->set_stream(nullptr);
       }
     }
@@ -153,8 +152,11 @@ int QuicProxyBackend::CurlSockCB(CURL *e,
   QuicProxyCurl* proxy = reinterpret_cast<QuicProxyCurl*>(sockp);
   const char *what_str[] = { "none", "IN", "OUT", "INOUT", "REMOVE" };
 
-  DVLOG(1) << "socket callback: s=" << s << " e="
-           << e << " what=" << what_str[what];
+  DVLOG(1)
+  // LOG(INFO)
+    << "stream id: " << (proxy ? proxy->get_stream_id():0)
+    << " socket callback: s=" << s << " e="
+    << e << " what=" << what_str[what];
 
   if (what == CURL_POLL_REMOVE) {
     backend->CurlRemoveSock(proxy);
@@ -188,7 +190,7 @@ void QuicProxyBackend::CurlAddSock(curl_socket_t s,
   QuicProxyCurl* proxy = proxy_iterator->second.get();
   proxy->set_sockfd(s);
   server_->epoll_server()->RegisterFD(s, proxy,
-                         EPOLLIN | EPOLLOUT | EPOLLET);
+                         EPOLLIN | EPOLLOUT);
   CurlSetSock(proxy, s, easy, action);
   curl_multi_assign(multi_curl_, s, proxy);
 }
@@ -237,7 +239,7 @@ int QuicProxyBackend::CurlMultiTimerCB(CURLM *multi,
   
 bool QuicProxyBackend::CreateProxyCurl(
                           const std::string& request_url,
-                          QuicSpdyStream* quic_stream,
+                          QuicProxyStream* quic_stream,
                           std::shared_ptr<QuicProxyCurl>& proxy) {
   auto proxy_ptr = std::make_shared<QuicProxyCurl>(request_url, this, quic_stream);
   if (false == proxy_ptr->InitializeProxyCurl()) {
@@ -246,7 +248,6 @@ bool QuicProxyBackend::CreateProxyCurl(
 
   proxy = proxy_ptr;
   proxy_http_hash_[proxy->get_curl()] = proxy;
-  proxy_stream_hash_[quic_stream] = proxy;
   return true;
 }
   

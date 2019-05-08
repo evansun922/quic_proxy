@@ -12,7 +12,8 @@
 namespace quic {
 
 class QuicProxyServer;
-
+class QuicProxyStream;
+  
 class QuicProxyBackend : public QuicSimpleServerBackend {
  public:
   QuicProxyBackend();
@@ -53,18 +54,15 @@ class QuicProxyBackend : public QuicSimpleServerBackend {
                               QuicProxyBackend *backend);
 
   bool CreateProxyCurl(const std::string& request_url,
-                       QuicSpdyStream* quic_stream,
+                       QuicProxyStream* quic_stream,
                        std::shared_ptr<QuicProxyCurl>& proxy);
 
   bool cache_initialized_;
 
   // curl multiplexing IO 
   CURLM *multi_curl_;
-  // timer filedescriptor
-  int timer_fd_;
+
   QuicProxyServer *server_;
-  std::unordered_map<QuicSpdyStream*,
-                     std::shared_ptr<QuicProxyCurl>> proxy_stream_hash_;
   std::unordered_map<CURL*, std::shared_ptr<QuicProxyCurl>> proxy_http_hash_;
   std::list<std::shared_ptr<QuicProxyCurl>> proxy_http_dead_list_;
 
