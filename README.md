@@ -30,6 +30,9 @@ chromium 项目本身提供了一个测试用的quic服务，但是这个服务�
       "third_party/quiche/src/quic/proxy_quic/quic_proxy_packet_writer.cc",
       "third_party/quiche/src/quic/proxy_quic/quic_proxy_packet_reader.cc",
       "third_party/quiche/src/quic/proxy_quic/sendmmsgtimer.cc",
+      "third_party/quiche/src/quic/proxy_quic/quic_proxy_dispatcher.cc",
+      "third_party/quiche/src/quic/proxy_quic/quic_proxy_session.cc",
+      "third_party/quiche/src/quic/proxy_quic/quic_proxy_stream.cc",
     ]
     include_dirs = [
       "/usr/local/include"

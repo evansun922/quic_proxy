@@ -30,6 +30,9 @@ We have rewritten epoll_quic_server based on the chromium, the new quic server s
       "third_party/quiche/src/quic/proxy_quic/quic_proxy_packet_writer.cc",
       "third_party/quiche/src/quic/proxy_quic/quic_proxy_packet_reader.cc",
       "third_party/quiche/src/quic/proxy_quic/sendmmsgtimer.cc",
+      "third_party/quiche/src/quic/proxy_quic/quic_proxy_dispatcher.cc",
+      "third_party/quiche/src/quic/proxy_quic/quic_proxy_session.cc",
+      "third_party/quiche/src/quic/proxy_quic/quic_proxy_stream.cc",
     ]
     include_dirs = [
       "/usr/local/include"
