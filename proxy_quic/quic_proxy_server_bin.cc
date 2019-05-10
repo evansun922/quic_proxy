@@ -57,8 +57,13 @@ int main(int argc, char* argv[]) {
   // worker();
   // return 0;
 
-  if (true == GetQuicFlag(FLAGS_daemon))
-    daemon(1, 1);
+  // SetQuicReloadableFlag(quic_default_to_bbr, true);
+  
+  if (true == GetQuicFlag(FLAGS_daemon)) {
+    if (0 !=daemon(1, 1) ) {
+      exit(0);
+    }
+  }
   
   int cpu_count = ::get_nprocs();
   for(int i = 0; i < cpu_count; i++) {

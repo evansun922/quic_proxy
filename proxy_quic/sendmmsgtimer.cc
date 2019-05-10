@@ -20,9 +20,9 @@ void SendMMsgTimer::InitializeTimer(QuicEpollServer* epoll_server) {
     struct itimerspec its;
     memset(&its, 0, sizeof(struct itimerspec));
     its.it_interval.tv_sec = 0;
-    its.it_interval.tv_nsec = 200000000; //200ms
+    its.it_interval.tv_nsec = 40000000; //40ms
     its.it_value.tv_sec = 0;
-    its.it_value.tv_nsec = 200000000; //200ms 
+    its.it_value.tv_nsec = 40000000; //40ms 
     timerfd_settime(timer_fd_, TIMER_ABSTIME, &its, NULL);
 
     epoll_server->RegisterFD(timer_fd_, this,

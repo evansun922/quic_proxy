@@ -44,6 +44,7 @@ namespace quic {
 namespace {
 
 const int kEpollFlags = EPOLLIN | EPOLLOUT | EPOLLET;
+
 const char kSourceAddressTokenSecret[] = "secret";
 
 }  // namespace
