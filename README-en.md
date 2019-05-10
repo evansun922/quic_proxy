@@ -11,7 +11,7 @@ We have rewritten epoll_quic_server based on the chromium, the new quic server s
 - Use quic of chromium, we can always use the latest version of quic.
 - This project is a c++ project, support for linux systems only.
 - This project use libcurl to backend.
-- Currently, this project support http-get only, we will continue to support http-post, chunked, etc.
+- Currently, not support http-chunked.
 
 ## Building
 
@@ -60,7 +60,14 @@ We have rewritten epoll_quic_server based on the chromium, the new quic server s
 6. ninja -C out/Debug quic_proxy_server (step 5, 6 see [Build the QUIC client and server](https://www.chromium.org/quic/playing-with-quic))
 
 ## Running
+```
 out/Debug/quic_proxy_server --quic_proxy_backend_url=http://backend-host --certificate_file=/path/you.crt --key_file=/path/you.pkcs8
+```
+for daemon:
+```
+./logrun.pl /path/log-dir out/Debug/quic_proxy_server --port=443 --daemon=true --quic_proxy_backend_url=http://backend-host --certificate_file=/path/you.crt --key_file=/path/you.pkcs8
+```
+
 
 ## Contact
 my email: sswin0922@163.com

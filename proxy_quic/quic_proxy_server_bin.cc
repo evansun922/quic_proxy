@@ -29,6 +29,13 @@ DEFINE_QUIC_COMMAND_LINE_FLAG(
     "The URL for the single backend server hostname"
     "For example, \"http://xyz.com:80\"");
 
+
+DEFINE_QUIC_COMMAND_LINE_FLAG(bool,
+                              daemon,
+                              false,
+                              "The daemon runing.");
+
+
 static void worker();
 
 int main(int argc, char* argv[]) {
@@ -47,8 +54,11 @@ int main(int argc, char* argv[]) {
   CHECK(logging::InitLogging(settings));
 
   // test
-  worker();
-  return 0;
+  // worker();
+  // return 0;
+
+  if (true == GetQuicFlag(FLAGS_daemon))
+    daemon(1, 1);
   
   int cpu_count = ::get_nprocs();
   for(int i = 0; i < cpu_count; i++) {

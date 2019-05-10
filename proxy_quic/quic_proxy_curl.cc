@@ -104,15 +104,15 @@ void QuicProxyCurl::StartHttp(const spdy::SpdyHeaderBlock& request_headers,
   // curl_easy_setopt(easy_, CURLOPT_LOW_SPEED_LIMIT, 10L);
   
   curl_easy_setopt(easy_, CURLOPT_NOPROGRESS, 0L);
-  // curl_easy_setopt(easy_, CURLOPT_VERBOSE, 1L);
-  // curl_easy_setopt(easy_, CURLOPT_BUFFERSIZE, 1024*64L);
+  curl_easy_setopt(easy_, CURLOPT_VERBOSE, 1L);
+  curl_easy_setopt(easy_, CURLOPT_BUFFERSIZE, 1024*32L);
   curl_easy_setopt(easy_, CURLOPT_MAX_RECV_SPEED_LARGE, (curl_off_t)(1024*1024*2));
   
   if (method == "POST" || method == "PUT" ||
       method == "PATCH") {
     // Upload content must be set
     if (!request_body.empty()) {
-      LOG(INFO) << "request_body size is " << request_body_.length();
+      LOG(INFO) << "request_body size is " << request_body.length();
       request_body_ = request_body;
       curl_easy_setopt(easy_, CURLOPT_UPLOAD, 1L);
       curl_easy_setopt(easy_, CURLOPT_INFILESIZE,
@@ -131,7 +131,7 @@ void QuicProxyCurl::StartHttp(const spdy::SpdyHeaderBlock& request_headers,
 }
 
 void QuicProxyCurl::ContinueDownload(uint64_t buffer_size) {
-  const uint64_t continue_download_size = 128*1024;
+  const uint64_t continue_download_size = 1024*512;
   if (buffer_size <= continue_download_size &&
       is_pause_ == true) {
     is_pause_ = false;
@@ -226,6 +226,7 @@ size_t QuicProxyCurl::HttpHeaderCallback(void* contents,
     if (proxy->content_length_ == 0) {
       fin = true;
       if ((http_status == "200" && http_ver == "1.0") ||
+          http_status == "100" ||
           transfer_encoding == "chunked") {
         fin = false;
       }
@@ -233,13 +234,14 @@ size_t QuicProxyCurl::HttpHeaderCallback(void* contents,
         
     // LOG(INFO) << "send request header " << proxy->quic_stream_->id()
     //           << " content-length " << proxy->content_length_
-    //           << " dff " << fin;
+    //           << " fin " << fin;
     ((proxy->quic_stream_))->WriteHeaders(std::move(proxy->spdy_headers_),
                                           fin, nullptr);
     return real_size;
   }
 
   QuicStringPiece line(header_line, real_size - 2);
+  // LOG(INFO) << "Respond header: " << line;
 
   if (line.substr(0, 4) == "HTTP") {
     size_t pos = line.find(" ");
@@ -298,7 +300,7 @@ int QuicProxyCurl::ProgressQuicCallback(void* userp,
     return CURLE_ABORTED_BY_CALLBACK;    
   }
 
-  const uint64_t pause_download_size = 512*1024;
+  const uint64_t pause_download_size = 1024*1024;
   
   if (proxy->quic_stream_->BufferedDataBytes() >= pause_download_size &&
       proxy->is_pause_ == false) {

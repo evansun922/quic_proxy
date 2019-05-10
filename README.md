@@ -10,7 +10,7 @@ chromium 项目本身提供了一个测试用的quic服务，但是这个服务�
 - 使用chromium项目提供的quic协议，保证了总能使用最新版本的quic协议，避免使用其他quic开源项目协议更新慢，实现不完全的苦恼。
 - 本项目是c++项目，仅支持linux系统。
 - 由于chromium项目过于复杂难读，目前回源使用的是libcurl，未使用chromium项目自带的http代码。
-- 仅支持http-get请求，不支持http-chunked。(后面会陆续开发http-post，ftp，chunked等功能)
+- 暂不支持http-chunked方式
 
 ## 编译步骤
 
@@ -60,7 +60,16 @@ chromium 项目本身提供了一个测试用的quic服务，但是这个服务�
 6. ninja -C out/Debug quic_proxy_server （5，6两步具体参数的使用，详见：[Build the QUIC client and server](https://www.chromium.org/quic/playing-with-quic)）
 
 ## 运行
+前台运行：
+
+```
 out/Debug/quic_proxy_server --quic_proxy_backend_url=http://backend-host --certificate_file=/path/you.crt --key_file=/path/you.pkcs8
+```
+
+后台运行：
+```
+./logrun.pl /path/log-dir out/Debug/quic_proxy_server --port=443 --daemon=true --quic_proxy_backend_url=http://backend-host --certificate_file=/path/you.crt --key_file=/path/you.pkcs8
+```
 
 ## 联系
 欢迎提出改进或者bug等问题，作者邮箱：sswin0922@163.com, QQ:15543852
