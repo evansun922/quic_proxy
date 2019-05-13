@@ -96,9 +96,9 @@ void QuicProxyCurl::StartHttp(const spdy::SpdyHeaderBlock& request_headers,
   curl_easy_setopt(easy_, CURLOPT_HEADERDATA, this);
   curl_easy_setopt(easy_, CURLOPT_ERRORBUFFER, error_);
   curl_easy_setopt(easy_, CURLOPT_PRIVATE, this);
-  curl_easy_setopt(easy_, CURLOPT_PROGRESSFUNCTION,
-                   QuicProxyCurl::ProgressQuicCallback);
-  curl_easy_setopt(easy_, CURLOPT_PROGRESSDATA, this);
+  // curl_easy_setopt(easy_, CURLOPT_PROGRESSFUNCTION,
+  //                  QuicProxyCurl::ProgressQuicCallback);
+  // curl_easy_setopt(easy_, CURLOPT_PROGRESSDATA, this);
   curl_easy_setopt(easy_, CURLOPT_FOLLOWLOCATION, 1L);
   // curl_easy_setopt(easy_, CURLOPT_LOW_SPEED_TIME, 3L);
   // curl_easy_setopt(easy_, CURLOPT_LOW_SPEED_LIMIT, 10L);
@@ -106,7 +106,7 @@ void QuicProxyCurl::StartHttp(const spdy::SpdyHeaderBlock& request_headers,
   curl_easy_setopt(easy_, CURLOPT_NOPROGRESS, 0L);
   curl_easy_setopt(easy_, CURLOPT_VERBOSE, 1L);
   curl_easy_setopt(easy_, CURLOPT_BUFFERSIZE, 1024*32L);
-  curl_easy_setopt(easy_, CURLOPT_MAX_RECV_SPEED_LARGE, (curl_off_t)(1024*1024*2));
+  // curl_easy_setopt(easy_, CURLOPT_MAX_RECV_SPEED_LARGE, (curl_off_t)(1024*1024*2));
   
   if (method == "POST" || method == "PUT" ||
       method == "PATCH") {
@@ -131,12 +131,12 @@ void QuicProxyCurl::StartHttp(const spdy::SpdyHeaderBlock& request_headers,
 }
 
 void QuicProxyCurl::ContinueDownload(uint64_t buffer_size) {
-  const uint64_t continue_download_size = 1024*512;
-  if (buffer_size <= continue_download_size &&
-      is_pause_ == true) {
-    is_pause_ = false;
-    curl_easy_pause(easy_, CURLPAUSE_CONT);
-  }
+  // const uint64_t continue_download_size = 1024*1024*20;
+  // if (buffer_size <= continue_download_size &&
+  //     is_pause_ == true) {
+  //   is_pause_ = false;
+  //   curl_easy_pause(easy_, CURLPAUSE_CONT);
+  // }
 }
   
 void QuicProxyCurl::OnEvent(int fd, QuicEpollEvent* event) {
@@ -300,7 +300,7 @@ int QuicProxyCurl::ProgressQuicCallback(void* userp,
     return CURLE_ABORTED_BY_CALLBACK;    
   }
 
-  const uint64_t pause_download_size = 1024*1024;
+  const uint64_t pause_download_size = 1024*1024*40;
   
   if (proxy->quic_stream_->BufferedDataBytes() >= pause_download_size &&
       proxy->is_pause_ == false) {
