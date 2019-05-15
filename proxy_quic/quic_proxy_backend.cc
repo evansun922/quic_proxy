@@ -129,7 +129,6 @@ void QuicProxyBackend::CheckCurlMultiInfo() {
 
       if (proxy->get_stream()) {
         proxy->get_stream()->set_proxy_curl(nullptr);
-        // TODO close this stream
         proxy->set_stream(nullptr);
       }
     }

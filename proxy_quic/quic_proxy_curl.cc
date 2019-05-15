@@ -103,8 +103,8 @@ void QuicProxyCurl::StartHttp(const spdy::SpdyHeaderBlock& request_headers,
   // curl_easy_setopt(easy_, CURLOPT_LOW_SPEED_TIME, 3L);
   // curl_easy_setopt(easy_, CURLOPT_LOW_SPEED_LIMIT, 10L);
   
-  curl_easy_setopt(easy_, CURLOPT_NOPROGRESS, 0L);
-  curl_easy_setopt(easy_, CURLOPT_VERBOSE, 1L);
+  // curl_easy_setopt(easy_, CURLOPT_NOPROGRESS, 0L);
+  // curl_easy_setopt(easy_, CURLOPT_VERBOSE, 1L);
   curl_easy_setopt(easy_, CURLOPT_BUFFERSIZE, 1024*32L);
   // curl_easy_setopt(easy_, CURLOPT_MAX_RECV_SPEED_LARGE, (curl_off_t)(1024*1024*2));
   
@@ -181,6 +181,7 @@ size_t QuicProxyCurl::WriteQuicCallback(void* contents,
   //             << proxy->content_length_
   //             << " quic stream id " << proxy->quic_stream_->id();
   // }
+  
   return real_size;
 }
 
@@ -210,12 +211,12 @@ size_t QuicProxyCurl::HttpHeaderCallback(void* contents,
     if (it_status != proxy->spdy_headers_.end()) {
       http_status = it_status->second.as_string();
     }
-    std::string http_ver("");
-    auto it_ver = proxy->spdy_headers_.find(":ver");
-    if (it_ver != proxy->spdy_headers_.end()) {
-      http_ver = it_ver->second.as_string();
-      proxy->spdy_headers_.erase(":ver");
-    }
+    // std::string http_ver("");
+    // auto it_ver = proxy->spdy_headers_.find(":ver");
+    // if (it_ver != proxy->spdy_headers_.end()) {
+    //   http_ver = it_ver->second.as_string();
+    //   proxy->spdy_headers_.erase(":ver");
+    // }
     std::string transfer_encoding("");
     auto it_transfer_encoding = proxy->spdy_headers_.find("transfer-encoding");
     if (it_transfer_encoding != proxy->spdy_headers_.end()) {
@@ -225,7 +226,7 @@ size_t QuicProxyCurl::HttpHeaderCallback(void* contents,
     bool fin = false;
     if (proxy->content_length_ == 0) {
       fin = true;
-      if ((http_status == "200" && http_ver == "1.0") ||
+      if (http_status == "200" ||
           http_status == "100" ||
           transfer_encoding == "chunked") {
         fin = false;
@@ -252,7 +253,7 @@ size_t QuicProxyCurl::HttpHeaderCallback(void* contents,
     }
     
     proxy->spdy_headers_[":status"] = line.substr(pos + 1, 3);
-    proxy->spdy_headers_[":ver"] = line.substr(5, 3);
+    // proxy->spdy_headers_[":ver"] = line.substr(5, 3);
     return real_size;
   }
 

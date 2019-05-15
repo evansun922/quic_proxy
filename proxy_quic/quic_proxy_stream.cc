@@ -35,6 +35,11 @@ bool QuicProxyStream::OnStreamFrameAcked(QuicStreamOffset offset,
                                                        newly_acked_length);
   if (quic_proxy_curl_) {
     quic_proxy_curl_->ContinueDownload(BufferedDataBytes());
+  } else if (false == fin_sent() &&
+             BufferedDataBytes() == 0) {
+    // quic_proxy_curl_ is nullptr and close this stream
+    set_fin_sent(true);
+    CloseWriteSide();
   }
   return rs;
 }

@@ -53,11 +53,11 @@ int main(int argc, char* argv[]) {
   settings.logging_dest = logging::LOG_TO_SYSTEM_DEBUG_LOG;
   CHECK(logging::InitLogging(settings));
 
-  // test
+  // SetQuicReloadableFlag(quic_default_to_bbr, true);
+  
+  // // test
   // worker();
   // return 0;
-
-  //SetQuicReloadableFlag(quic_default_to_bbr, true);
   
   if (true == GetQuicFlag(FLAGS_daemon)) {
     if (0 !=daemon(1, 1) ) {

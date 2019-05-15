@@ -45,6 +45,7 @@ namespace {
 
 const int kEpollFlags = EPOLLIN | EPOLLOUT | EPOLLET;
 
+
 const char kSourceAddressTokenSecret[] = "secret";
 
 }  // namespace
@@ -82,6 +83,7 @@ QuicProxyServer::QuicProxyServer(
       crypto_config_options_(crypto_config_options),
       version_manager_(supported_versions),
       packet_reader_(new QuicProxyPacketReader()),
+      // packet_reader_(new QuicPacketReader()),
       quic_simple_server_backend_(quic_simple_server_backend),
       expected_connection_id_length_(expected_connection_id_length) {
   Initialize();
@@ -160,7 +162,7 @@ bool QuicProxyServer::CreateUDPSocketAndListen(const QuicSocketAddress& address)
 }
 
 QuicPacketWriter* QuicProxyServer::CreateWriter(int fd) {
-  //return new QuicDefaultPacketWriter(fd);
+  // return new QuicDefaultPacketWriter(fd);
   QuicProxyPacketWriter *writer = new QuicProxyPacketWriter(fd);
   sendmmsg_timer_.reset(new SendMMsgTimer(writer));
   sendmmsg_timer_->InitializeTimer(&epoll_server_);

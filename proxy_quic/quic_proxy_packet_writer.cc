@@ -15,7 +15,16 @@ WriteResult QuicProxyPacketWriter::WritePacket(
     PerPacketOptions* options) {
   DCHECK(!IsWriteBlocked());
   DCHECK(nullptr == options)
-      << "QuicProxyPacketWriter does not accept any options."; 
+      << "QuicProxyPacketWriter does not accept any options.";
+
+  if (buffered_writes_.size() >= max_cache_buffer_write_size) {
+    Flush();
+    if (buffered_writes_.size() >= max_cache_buffer_write_size) {
+      set_write_blocked(true);
+      return WriteResult(WRITE_STATUS_BLOCKED, EAGAIN);
+    }    
+  }
+  
   char *cpy_buffer = writes_cache_[writes_cache_pos_%max_cache_buffer_write_size];
   memcpy(cpy_buffer, buffer, buf_len);
   writes_cache_pos_++;
@@ -25,11 +34,11 @@ WriteResult QuicProxyPacketWriter::WritePacket(
     WriteResult result = Flush();
     if (IsWriteBlockedStatus(result.status)) {
       set_write_blocked(true);
+      return result;
     }
-    return result;
   }
 
-  return WriteResult(WRITE_STATUS_OK, 0);
+  return WriteResult(WRITE_STATUS_OK, buf_len);
 }
 
 WriteResult QuicProxyPacketWriter::Flush() {
@@ -43,7 +52,7 @@ WriteResult QuicProxyPacketWriter::Flush() {
       });
   int num_packets_sent = 0;
   WriteResult result = QuicLinuxSocketUtils::WriteMultiplePackets(
-              fd(), &mhdr, &num_packets_sent, quic_sys_call_wrapper_);
+              fd(), &mhdr, &num_packets_sent);
   if (num_packets_sent > 0) {
     buffered_writes_.erase(buffered_writes_.begin(),
                            buffered_writes_.begin() + num_packets_sent);

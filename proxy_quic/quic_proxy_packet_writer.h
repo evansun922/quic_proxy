@@ -28,7 +28,7 @@ class QUIC_EXPORT_PRIVATE QuicProxyPacketWriter : public QuicDefaultPacketWriter
   QuicDeque<BufferedWrite> buffered_writes_;
   char writes_cache_[max_cache_buffer_write_size][kEthernetMTU];
   size_t writes_cache_pos_;
-  QuicSyscallWrapper quic_sys_call_wrapper_;
+  // QuicSyscallWrapper quic_sys_call_wrapper_;
 };
 
 }  // namespace quic
