@@ -26,13 +26,15 @@ class SendMMsgTimer;
 class QuicProxyServer : public QuicEpollCallbackInterface {
  public:
   QuicProxyServer(std::unique_ptr<ProofSource> proof_source,
-             QuicSimpleServerBackend* quic_simple_server_backend);
+             QuicSimpleServerBackend* quic_simple_server_backend,
+             int interval);
   QuicProxyServer(std::unique_ptr<ProofSource> proof_source,
              const QuicConfig& config,
              const QuicCryptoServerConfig::ConfigOptions& server_config_options,
              const ParsedQuicVersionVector& supported_versions,
              QuicSimpleServerBackend* quic_simple_server_backend,
-             uint8_t expected_connection_id_length);
+             uint8_t expected_connection_id_length,
+             int interval);
   QuicProxyServer(const QuicProxyServer&) = delete;
   QuicProxyServer& operator=(const QuicProxyServer&) = delete;
 
@@ -145,6 +147,7 @@ class QuicProxyServer : public QuicEpollCallbackInterface {
   uint8_t expected_connection_id_length_;
 
   std::unique_ptr<SendMMsgTimer> sendmmsg_timer_;
+  int sendmmsgtimer_interval_;
 };
 
 }  // namespace quic

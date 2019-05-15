@@ -97,7 +97,7 @@ void QuicProxyBackend::InitializeCURLM() {
                     QuicProxyBackend::CurlMultiTimerCB);
   curl_multi_setopt(multi_curl_, CURLMOPT_TIMERDATA, this);
 
-  curl_timer_.InitializeCurlTimer();  
+  curl_timer_.InitializeCurlTimer();
 }
   
 void QuicProxyBackend::CheckCurlMultiInfo() {

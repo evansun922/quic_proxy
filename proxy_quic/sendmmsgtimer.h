@@ -17,7 +17,7 @@ class SendMMsgTimer : public QuicEpollCallbackInterface {
   SendMMsgTimer& operator=(const SendMMsgTimer&) = delete;
   ~SendMMsgTimer() override;
 
-  void InitializeTimer(QuicEpollServer* epoll_server);
+  void InitializeTimer(QuicEpollServer* epoll_server, int interval);
   
   int get_timerfd() { return timer_fd_; }
   void set_timerfd(int fd) { timer_fd_ = fd; }

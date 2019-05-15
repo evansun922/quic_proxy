@@ -26,14 +26,31 @@ DEFINE_QUIC_COMMAND_LINE_FLAG(
     quic_proxy_backend_url,
     "",
     "<http/https>://<hostname_ip>:<port_number>"
-    "The URL for the single backend server hostname"
-    "For example, \"http://xyz.com:80\"");
-
+    " The URL for the single backend server hostname"
+    " For example, \"http://xyz.com:80\"");
 
 DEFINE_QUIC_COMMAND_LINE_FLAG(bool,
                               daemon,
                               false,
                               "The daemon runing.");
+
+DEFINE_QUIC_COMMAND_LINE_FLAG(bool,
+                              bbr,
+                              false,
+                              "Use bbr congestion control,"
+                              " default cubic");
+
+DEFINE_QUIC_COMMAND_LINE_FLAG(bool,
+                              test,
+                              false,
+                              "Runing single process for test");
+
+DEFINE_QUIC_COMMAND_LINE_FLAG(int32_t,
+                             sendmmsgtimer_interval,
+                             40000000,
+                             "Specify an interval to refresh the cache to send data"
+                             " unit: nanoseconds"
+                             " default 40000000");
 
 
 static void worker();
@@ -53,11 +70,15 @@ int main(int argc, char* argv[]) {
   settings.logging_dest = logging::LOG_TO_SYSTEM_DEBUG_LOG;
   CHECK(logging::InitLogging(settings));
 
-  // SetQuicReloadableFlag(quic_default_to_bbr, true);
-  
-  // // test
-  // worker();
-  // return 0;
+  if (true == GetQuicFlag(FLAGS_bbr)) {
+    SetQuicReloadableFlag(quic_default_to_bbr, true);
+  }
+ 
+  if (true == GetQuicFlag(FLAGS_test)) {
+    // test
+    worker();
+    return 0;
+  }
   
   if (true == GetQuicFlag(FLAGS_daemon)) {
     if (0 !=daemon(1, 1) ) {
@@ -107,7 +128,8 @@ static void worker() {
   }
 
   quic::QuicProxyServer server(quic::CreateDefaultProofSource(),
-                          &proxy_backend);
+                               &proxy_backend,
+                               GetQuicFlag(FLAGS_sendmmsgtimer_interval));
 
   if (!server.CreateUDPSocketAndListen(quic::QuicSocketAddress(
           quic::QuicIpAddress::Any6(), GetQuicFlag(FLAGS_port)))) {
