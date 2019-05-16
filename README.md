@@ -10,7 +10,6 @@ chromium 项目本身提供了一个测试用的quic服务，但是这个服务�
 - 使用chromium项目提供的quic协议，保证了总能使用最新版本的quic协议，避免使用其他quic开源项目协议更新慢，实现不完全的苦恼。
 - 本项目是c++项目，仅支持linux系统。
 - 由于chromium项目过于复杂难读，目前回源使用的是libcurl，未使用chromium项目自带的http代码。
-- 暂不支持http-chunked方式
 
 ## 编译步骤
 

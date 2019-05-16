@@ -11,7 +11,6 @@ We have rewritten epoll_quic_server based on the chromium, the new quic server s
 - Use quic of chromium, we can always use the latest version of quic.
 - This project is a c++ project, support for linux systems only.
 - This project use libcurl to backend.
-- Currently, not support http-chunked.
 
 ## Building
 
