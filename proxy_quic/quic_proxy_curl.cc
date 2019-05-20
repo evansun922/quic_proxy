@@ -1,7 +1,6 @@
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_curl.h"
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_backend.h"
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_stream.h"
-//#include "net/third_party/quiche/src/quic/tools/quic_simple_dispatcher.h"
 #include "net/third_party/quiche/src/quic/platform/api/quic_text_utils.h"
 #include "net/http/http_util.h"
 
@@ -62,6 +61,10 @@ void QuicProxyCurl::StartHttp(const spdy::SpdyHeaderBlock& request_headers,
     request_header_list_ =
       curl_slist_append(request_header_list_, h.c_str());
   }
+  // X-Real-IP
+  std::string x_real_ip = "x-real-ip: " + quic_stream_->get_peer_ip();
+  request_header_list_ =
+    curl_slist_append(request_header_list_, x_real_ip.c_str());
 
   std::string method = "";
   auto it = request_headers.find(":method");

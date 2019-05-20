@@ -25,7 +25,9 @@ class QuicProxyStream : public QuicSimpleServerStream {
 
   void set_proxy_curl(QuicProxyCurl* proxy) { quic_proxy_curl_ = proxy; }
   QuicProxyCurl* get_proxy_curl() { return quic_proxy_curl_; }
+  std::string get_peer_ip();
 
+  
   bool OnStreamFrameAcked(QuicStreamOffset offset,
                           QuicByteCount data_length,
                           bool fin_acked,

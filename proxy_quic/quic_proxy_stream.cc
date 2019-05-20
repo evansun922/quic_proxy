@@ -1,5 +1,6 @@
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_stream.h"
 #include "net/third_party/quiche/src/quic/proxy_quic/quic_proxy_curl.h"
+#include "net/third_party/quiche/src/quic/core/quic_session.h"
 
 namespace quic {
 
@@ -23,6 +24,10 @@ QuicProxyStream::QuicProxyStream(
 
 QuicProxyStream::~QuicProxyStream() = default;
 
+std::string QuicProxyStream::get_peer_ip() {
+  return session()->peer_address().host().Normalized().ToString();
+}
+  
 bool QuicProxyStream::OnStreamFrameAcked(QuicStreamOffset offset,
                                          QuicByteCount data_length,
                                          bool fin_acked,
