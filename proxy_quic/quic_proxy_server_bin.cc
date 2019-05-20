@@ -49,8 +49,14 @@ DEFINE_QUIC_COMMAND_LINE_FLAG(int32_t,
                              sendmmsgtimer_interval,
                              40000000,
                              "Specify an interval to refresh the cache to send data"
-                             " unit: nanoseconds"
+                             " in nanoseconds,"
                              " default 40000000");
+
+DEFINE_QUIC_COMMAND_LINE_FLAG(int32_t,
+                             idle_network_timeout,
+                             -1,
+                             "Idle network timeout in seconds, "
+                             " default 600s");
 
 
 static void worker();
@@ -129,7 +135,8 @@ static void worker() {
 
   quic::QuicProxyServer server(quic::CreateDefaultProofSource(),
                                &proxy_backend,
-                               GetQuicFlag(FLAGS_sendmmsgtimer_interval));
+                               GetQuicFlag(FLAGS_sendmmsgtimer_interval),
+                               GetQuicFlag(FLAGS_idle_network_timeout));
 
   if (!server.CreateUDPSocketAndListen(quic::QuicSocketAddress(
           quic::QuicIpAddress::Any6(), GetQuicFlag(FLAGS_port)))) {

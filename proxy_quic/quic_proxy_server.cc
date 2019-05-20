@@ -55,14 +55,16 @@ const size_t kNumSessionsToCreatePerSocketEvent = 16;
   
 QuicProxyServer::QuicProxyServer(std::unique_ptr<ProofSource> proof_source,
       QuicSimpleServerBackend* quic_simple_server_backend,
-      int interval)
+      int interval,
+      int idle_network_timeout)
     : QuicProxyServer(std::move(proof_source),
                       QuicConfig(),
                       QuicCryptoServerConfig::ConfigOptions(),
                       AllSupportedVersions(),
                       quic_simple_server_backend,
                       kQuicDefaultConnectionIdLength,
-                      interval){}
+                      interval,
+                      idle_network_timeout){}
 
 QuicProxyServer::QuicProxyServer(
     std::unique_ptr<ProofSource> proof_source,
@@ -71,7 +73,8 @@ QuicProxyServer::QuicProxyServer(
     const ParsedQuicVersionVector& supported_versions,
     QuicSimpleServerBackend* quic_simple_server_backend,
     uint8_t expected_connection_id_length,
-    int interval)
+    int interval,
+    int idle_network_timeout)
     : port_(0),
       fd_(-1),
       packets_dropped_(0),
@@ -89,7 +92,12 @@ QuicProxyServer::QuicProxyServer(
       // packet_reader_(new QuicPacketReader()),
       quic_simple_server_backend_(quic_simple_server_backend),
       expected_connection_id_length_(expected_connection_id_length),
-      sendmmsgtimer_interval_(interval){
+      sendmmsgtimer_interval_(interval),
+      idle_network_timeout_(idle_network_timeout){
+  if (-1 != idle_network_timeout_) {
+    config_.SetIdleNetworkTimeout(QuicTime::Delta::FromSeconds(idle_network_timeout_),
+                                  QuicTime::Delta::FromSeconds(idle_network_timeout_/2));
+  }
   Initialize();
 }
 
