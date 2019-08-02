@@ -15,7 +15,7 @@ class QuicProxyStream : public QuicSimpleServerStream {
                   QuicSpdySession* session,
                   StreamType type,
                   QuicSimpleServerBackend* quic_simple_server_backend);
-  QuicProxyStream(PendingStream pending,
+  QuicProxyStream(PendingStream* pending,
                   QuicSpdySession* session,
                   StreamType type,
                   QuicSimpleServerBackend* quic_simple_server_backend);

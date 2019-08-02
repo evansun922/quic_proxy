@@ -37,9 +37,9 @@ QuicSpdyStream* QuicProxySession::CreateIncomingStream(QuicStreamId id) {
 }
 
 QuicSpdyStream* QuicProxySession::CreateIncomingStream(
-    PendingStream pending) {
+    PendingStream* pending) {
   QuicSpdyStream* stream = new QuicProxyStream(
-                std::move(pending), this, BIDIRECTIONAL, server_backend());
+                pending, this, BIDIRECTIONAL, server_backend());
   ActivateStream(QuicWrapUnique(stream));
   return stream;
 }

@@ -24,7 +24,7 @@ class QuicProxySession : public QuicSimpleServerSession {
  protected:
   // QuicSession methods:
   QuicSpdyStream* CreateIncomingStream(QuicStreamId id) override;
-  QuicSpdyStream* CreateIncomingStream(PendingStream pending) override;
+  QuicSpdyStream* CreateIncomingStream(PendingStream* pending) override;
   QuicSimpleServerStream* CreateOutgoingBidirectionalStream() override;
   QuicSimpleServerStream* CreateOutgoingUnidirectionalStream() override;
 

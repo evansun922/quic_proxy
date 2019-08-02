@@ -56,7 +56,7 @@ void QuicProxyBackend::FetchResponseFromBackend(
     QuicSimpleServerBackend::RequestHandler* quic_stream) {
 
   for (auto it = request_headers.begin(); it != request_headers.end(); ++it) {
-    QUIC_LOG(INFO) << it->first.as_string() << ": " << it->second.as_string();
+    LOG(INFO) << it->first.as_string() << ": " << it->second.as_string();
   }
   
   std::shared_ptr<QuicProxyCurl> proxy;

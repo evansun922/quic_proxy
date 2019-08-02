@@ -14,11 +14,11 @@ QuicProxyStream::QuicProxyStream(
 }
 
 QuicProxyStream::QuicProxyStream(
-    PendingStream pending,
+    PendingStream* pending,
     QuicSpdySession* session,
     StreamType type,
     QuicSimpleServerBackend* quic_simple_server_backend)
-    : QuicSimpleServerStream(std::move(pending), session, type, quic_simple_server_backend),
+    : QuicSimpleServerStream(pending, session, type, quic_simple_server_backend),
       quic_proxy_curl_(nullptr) {
 }
 
