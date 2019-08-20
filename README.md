@@ -1,5 +1,7 @@
 ## 介绍
 
+__推荐我的新项目__ https://github.com/evansun922/nginx-quic
+
 quic_proxy是一个quic代理服务，接收前端发来的quic协议请求，然后http代理到后端业务服务，例如nginx等。
 
 chromium 项目本身提供了一个测试用的quic服务，但是这个服务是单进程，且http回源需要整个文件下载完才能发给前端，大的视频文件这种方式是不能接受的。

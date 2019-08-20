@@ -1,5 +1,7 @@
 ## QUIC Proxy
 
+__Recommend my new project__ https://github.com/evansun922/nginx-quic
+
 quic_proxy is a high-performance quic proxy service. it receive a  request with quic from frontend and proxy to backend, e.g. nginx, etc.
 
 The chromium provide a demo service of quic, but this demo is a single process, and it download the full file from source station before it can be sent to the frontend, this is not acceptable for big file.
